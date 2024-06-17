@@ -1,0 +1,139 @@
+public class PlayerInfo : MonoBehaviour
+{
+
+    public Rigidbody2D rd;
+    public PlayerInventory inventory;
+
+    public int hunger;
+    public int maxHunger = 3;
+
+    public int HP;
+    public int maxHP = 3;
+
+    public float stamina;
+    public float staminaDrain;
+    public float staminaGain;
+    public int maxStamina = 5;
+    public int HungerDrain = 7;
+
+    public PlayerMovement move;
+
+    public HPBar HPBar;
+    public HungerBar hungerbar;
+    public StaminaBar staminabar;
+
+
+
+    public bool running;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        rd = GetComponent<Rigidbody2D>();
+        rd.GetComponent<BoxCollider2D>();
+        gameObject.tag = "Player";
+        HP = maxHP;
+        stamina = maxStamina;
+        HPBar.SetMaxHealth(maxHP);
+        hungerbar.SetMaxHunger(maxHunger);
+        staminabar.SetMaxStamina(maxStamina);
+
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        staminabar.SetStamina(stamina);   
+
+            //stamina recharges at a rate of .5 per 1/3 second (only if hungerbar isn't empty, and if the player isn't running, and if stamina isn't full)
+            if (hunger >= 1 && stamina < maxStamina && !move.isSprinting)
+            {
+                rechargeStamina(.5f);
+            }
+            //stamina recharges at a rate of .25 per 1/3 second (only if hungerbar is empty, and if the player isn't running, and if stamina isn't full)
+            else if (hunger == 0 && stamina < maxStamina && !move.isSprinting)
+            {
+                rechargeStamina(.25f);
+            }
+
+        //makes sure the stamina bar isn't filling past maximum
+        if (stamina > maxStamina)stamina = maxStamina;
+        
+
+
+    }
+
+    //runs the code for recharging the players stamina (receives any amount for recharge(recharges that amount every 1/3 second))
+    public void rechargeStamina(float i)
+    {
+
+            staminaGain -= Time.deltaTime;
+            if (staminaGain <= 0)
+            {
+                stamina += i;
+                staminaGain = 0.5f;
+                HungerDrain--;
+
+                if (HungerDrain == 0)
+                {
+                    getHungry(1);
+                    HungerDrain = 7;
+                }
+
+                
+            }
+        staminabar.SetStamina(stamina);
+    }
+    //consumes players Stamina in designated amount
+    public void Exhaust(float i)
+    {
+        staminaDrain -= Time.deltaTime;
+        if (staminaDrain <= 0)
+        {
+            stamina -= i;
+            staminaDrain = 0.5f;
+
+
+            staminabar.SetStamina(stamina);
+        }
+    }
+    
+    //consumes players hunger in designated amount
+    public void getHungry(int i)
+    {
+
+        hunger -= i;
+        hungerbar.SetHunger(hunger);
+        if (hunger < 0)
+        {
+            hunger = 0;
+        }
+    }
+
+    //increase players hunger in designated amount
+    public void Eat(int i)
+    {
+        if (hunger < maxHunger)
+        {
+            hunger += i;
+            hungerbar.SetHunger(hunger);
+
+        }
+    }
+    //increase players hp in designated amount
+    public void HealPlayer(int i)
+    {
+        HP += i;
+        HPBar.SetHealth(HP);
+    }
+
+    //consumes players hp in designated amount
+    public void DamagePlayer(int i)
+    {
+        HP -= i;
+        HPBar.SetHealth(HP);
+    }
+
+}
