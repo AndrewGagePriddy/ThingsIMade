@@ -1,5 +1,5 @@
 
-txtOut =r"\TextFile\ReadThis.txt"
+txtOut =r"TextFile\ReadThis.txt"
 def Fib(i):
 	f1 = 0
 	f2 = 1
